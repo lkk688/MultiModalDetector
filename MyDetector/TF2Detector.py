@@ -97,6 +97,7 @@ class MyTF2Detector(object):
         pred_class = [i-1 for i in list(pred_class)] # index starts with 1, 0 is the background in the tensorflow
         #print(pred_class)
             
+        #[ (xmin, ymin), (xmax, ymax)]
         pred_boxes = [[(i[1]*im_width, i[0]*im_height), (i[3]*im_width, i[2]*im_height)] for i in list(pred_boxes)] # Bounding boxes
         
         return pred_boxes, pred_class, scores
