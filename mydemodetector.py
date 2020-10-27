@@ -22,3 +22,6 @@ if __name__ == "__main__":
     print(imgpath)
     bbox_xyxy, pred_labels, cls_conf=detectimage.detectoneimage_novis(imgpath, mydetector)
     print(pred_labels)
+
+    outputvideopath='videoresult.mp4'
+    detectimage.detectimagefolder_tovideo(imgpath, mydetector, outputvideopath)
