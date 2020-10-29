@@ -12,6 +12,7 @@ import os
 import numpy as np
 #%matplotlib inline
 #from matplotlib import pyplot as plt
+from MyDetector.Postprocess import postfilter
 
 class MyDetectron2Detector(object):
     #args.showfig
@@ -23,6 +24,7 @@ class MyDetectron2Detector(object):
         self.args = args
         self.FULL_LABEL_CLASSES=args.FULL_LABEL_CLASSES
         use_cuda = True
+        self.threshold = args.threshold if args.threshold is not None else 0.1
 #         self.cfg = get_cfg()
 #         self.cfg.merge_from_file("detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 #         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set threshold for this model
@@ -78,16 +80,19 @@ class MyDetectron2Detector(object):
 #             newboxes=_convert_boxes(boxes)
             #bbox_xcycwh=BoxMode.convert(newboxes, BoxMode.XYXY_ABS, BoxMode.XYWH_ABS)  #BoxMode.convert(x, BoxMode.XYXY_ABS, BoxMode.XYWH_ABS)
     
-        boxes = outputs["instances"].pred_boxes.tensor.cpu().numpy()
-        classes = outputs["instances"].pred_classes.cpu().numpy()
-        scores = outputs["instances"].scores.cpu().numpy()
+        pred_boxes = outputs["instances"].pred_boxes.tensor.cpu().numpy()
+        pred_class = outputs["instances"].pred_classes.cpu().numpy()
+        pred_score = outputs["instances"].scores.cpu().numpy()
         
         #bbox_xywh=BoxMode.convert(boxes, BoxMode.XYXY_ABS, BoxMode.XYWH_ABS)
         #pred_class = [INSTANCE_CATEGORY_NAMES[i] for i in list(pred[0]['labels'].cpu().numpy())] # Get the Prediction Score
-        pred_boxes = [[(i[0], i[1]), (i[2], i[3])] for i in list(boxes)] # Bounding boxes
+        pred_boxes = [[(i[0], i[1]), (i[2], i[3])] for i in list(pred_boxes)] # Bounding boxes
         #pred_score = list(pred[0]['scores'].detach().cpu().numpy())
         
-        return pred_boxes, classes, scores
+        #Post filter based on threshold
+        pred_boxes, pred_class, pred_score = postfilter(pred_boxes, pred_class, pred_score, self.threshold)
+       
+        return pred_boxes, pred_class, pred_score
 
 #         bbox_xcycwh, cls_conf, cls_ids = [], [], []
 

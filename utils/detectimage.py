@@ -48,22 +48,16 @@ def detectoneimage_novis(imgpath, mydetector):
     end = time.time()
     #show_image_bbxyxy(im, bbox_xyxy, cls_ids, imgpath, mydetector.FULL_LABEL_CLASSES, 'testimg.pdf')
     #plotresults.show_imagewithscore_bbxyxy(im, bbox_xyxy, cls_ids, cls_conf, imgpath, mydetector.FULL_LABEL_CLASSES, 'testimg.pdf')
-    #cv2.imwrite('resulttest.jpg', imresult) 
+    img_box = plotresults.draw_boxes(im, bbox_xyxy, cls_ids, cls_conf, mydetector.FULL_LABEL_CLASSES)
+    cv2.imwrite('resulttest.jpg', img_box) 
     print("Detection time: {:.03f}s, fps: {:.03f}, detection numbers: {}".format(end - start, 1 / (end - start), len(bbox_xyxy)))
+    print("Image result saved to resulttest.jpg")
 
-<<<<<<< HEAD
     #pred_labels = [mydetector.FULL_LABEL_CLASSES[i] for i in list(cls_ids) ]
     return bbox_xyxy, cls_ids, cls_conf
 
 def detectimagefolder_tovideo(imgpath, mydetector, outputvideopath):
     imagepath=sorted(glob.glob(imgpath+'/*.jpg'))
-=======
-    pred_labels = [mydetector.FULL_LABEL_CLASSES[i] for i in list(cls_ids) ]
-    return bbox_xyxy, pred_labels, cls_conf
-
-def detectimagefolder_tovideo(imgpath, mydetector, outputvideopath):
-    imagepath=glob.glob(imgpath)
->>>>>>> 089d3bb2a735f42ba1a0876bd34e6fae4b5b5604
     imglen=len(imagepath)
     print("Total image:", imglen)
     imgidx=0
@@ -75,15 +69,10 @@ def detectimagefolder_tovideo(imgpath, mydetector, outputvideopath):
     im_height=imageshape[0]#1530#600
     print("Image width: ", im_width)
     print("Image height: ", im_height)
-<<<<<<< HEAD
     fourcc = cv2.VideoWriter_fourcc('M','P','4','V')
     #fourcc = cv2.VideoWriter_fourcc(*'XVID')
  #cv2.VideoWriter_fourcc(*'MJPG')#cv2.VideoWriter_fourcc('M','P','4','V')  #cv2.VideoWriter_fourcc(*'MJPG')
     videooutput = cv2.VideoWriter(outputvideopath, fourcc, 1, (im_width, im_height)) #20
-=======
-    fourcc = cv2.VideoWriter_fourcc('M','P','4','V')#cv2.VideoWriter_fourcc(*'MJPG')#cv2.VideoWriter_fourcc('M','P','4','V') #cv2.VideoWriter_fourcc(*'MJPG')
-    videooutput = cv2.VideoWriter(outputvideopath, fourcc, 20, (im_width, im_height))
->>>>>>> 089d3bb2a735f42ba1a0876bd34e6fae4b5b5604
         
     for imgidx in range(imglen): #imglen  while self.vdo.grab():
         filepath=imagepath[imgidx]
@@ -108,8 +97,4 @@ def detectimagefolder_tovideo(imgpath, mydetector, outputvideopath):
         #plotresults.show_imagewithscore_bbxyxy(im, bbox_xyxy, cls_ids, cls_conf, imgpath, mydetector.FULL_LABEL_CLASSES, outputvideopath+imageid+''.jpg')
     
     videooutput.release()
-<<<<<<< HEAD
     print("Finished all detections")
-=======
-    print("Finished all detections")
->>>>>>> 089d3bb2a735f42ba1a0876bd34e6fae4b5b5604

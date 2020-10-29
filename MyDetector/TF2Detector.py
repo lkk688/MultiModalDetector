@@ -21,6 +21,7 @@ from object_detection.utils import visualization_utils as viz_utils
 #from object_detection.utils import colab_utils
 from object_detection.builders import model_builder
 
+from MyDetector.Postprocess import postfilter
 
 #%matplotlib inline
 def load_image_into_numpy_array(path):
@@ -52,7 +53,8 @@ class MyTF2Detector(object):
     def __init__(self, args):
         self.args = args
         #self.FULL_LABEL_CLASSES=args.FULL_LABEL_CLASSES
-        self.threshold = args.threshold
+        #self.threshold = args.threshold
+        self.threshold = args.threshold if args.threshold is not None else 0.1
         
         tf.keras.backend.clear_session()
         self.detect_fn = tf.saved_model.load(args.modelbasefolder)
@@ -77,40 +79,43 @@ class MyTF2Detector(object):
         detections = self.detect_fn(input_tensor)
         
         #[0] means get the first batch, only one batch, 
-        boxes = detections['detection_boxes'][0].numpy() #xyxy type [0.26331702, 0.20630795, 0.3134004 , 0.2257505 ], [ymin, xmin, ymax, xmax]
+        pred_boxes = detections['detection_boxes'][0].numpy() #xyxy type [0.26331702, 0.20630795, 0.3134004 , 0.2257505 ], [ymin, xmin, ymax, xmax]
         #print(boxes)
-        classes = detections['detection_classes'][0].numpy().astype(np.int32)
+        pred_class = detections['detection_classes'][0].numpy().astype(np.int32)
         #print(classes)
-        scores = detections['detection_scores'][0].numpy() #decreasing order
+        pred_score = detections['detection_scores'][0].numpy() #decreasing order
         
-        #predlist=[scores.index(x) for x in scores if x > self.threshold] # Get list of index with score greater than threshold.
-        pred_score=[x for x in scores if x > self.threshold] # Get list of index with score greater than threshold.
-        #print(pred_score)
-        if len(pred_score)<1:
-            print("Empty")
-            pred_boxes=[]
-            pred_class=[]
-            pred_score=[]
-        else:
-            pred_t = np.where(scores==pred_score[-1])#get the last index
-            #print(pred_t)
-            pred_t=pred_t[0][0] #fetch value from tuple of array
-            #print(pred_t)
-            print("Box len:", len(boxes))
-            pred_boxes = boxes[:pred_t+1]
-            print("pred_score len:", len(pred_score))
-            #print("pred_boxes len:", len(pred_boxes))
-            pred_class = classes[:pred_t+1]
+        #Post filter based on threshold
+        pred_boxes, pred_class, pred_score = postfilter(pred_boxes, pred_class, pred_score, self.threshold)
+        if len(pred_class)>0:
             pred_class = [i-1 for i in list(pred_class)] # index starts with 1, 0 is the background in the tensorflow
-            #print(pred_class)
-            
-<<<<<<< HEAD
-            #[ (xmin, ymin), (xmax, ymax)]
+            #normalized [ymin, xmin, ymax, xmax] to [ (xmin, ymin), (xmax, ymax)] in image size
             pred_boxes = [[(i[1]*im_width, i[0]*im_height), (i[3]*im_width, i[2]*im_height)] for i in list(pred_boxes)] # Bounding boxes
-=======
-        #[ (xmin, ymin), (xmax, ymax)]
-        pred_boxes = [[(i[1]*im_width, i[0]*im_height), (i[3]*im_width, i[2]*im_height)] for i in list(pred_boxes)] # Bounding boxes
->>>>>>> 089d3bb2a735f42ba1a0876bd34e6fae4b5b5604
+        
+
+        # #predlist=[scores.index(x) for x in scores if x > self.threshold] # Get list of index with score greater than threshold.
+        # pred_score=[x for x in scores if x > self.threshold] # Get list of index with score greater than threshold.
+        # #print(pred_score)
+        # if len(pred_score)<1:
+        #     print("Empty")
+        #     pred_boxes=[]
+        #     pred_class=[]
+        #     pred_score=[]
+        # else:
+        #     pred_t = np.where(scores==pred_score[-1])#get the last index
+        #     #print(pred_t)
+        #     pred_t=pred_t[0][0] #fetch value from tuple of array
+        #     #print(pred_t)
+        #     print("Box len:", len(boxes))
+        #     pred_boxes = boxes[:pred_t+1]
+        #     print("pred_score len:", len(pred_score))
+        #     #print("pred_boxes len:", len(pred_boxes))
+        #     pred_class = classes[:pred_t+1]
+        #     pred_class = [i-1 for i in list(pred_class)] # index starts with 1, 0 is the background in the tensorflow
+        #     #print(pred_class)
+            
+        #     #[ (xmin, ymin), (xmax, ymax)]
+        #     pred_boxes = [[(i[1]*im_width, i[0]*im_height), (i[3]*im_width, i[2]*im_height)] for i in list(pred_boxes)] # Bounding boxes
         
         return pred_boxes, pred_class, pred_score
 

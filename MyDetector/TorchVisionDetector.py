@@ -2,6 +2,7 @@ import MyDetector.transforms as T
 import utils
 from PIL import Image
 from glob import glob
+import numpy as np
 import sys
 import torch
 import torch.utils.data as data
@@ -13,6 +14,7 @@ from torchvision.models.detection.faster_rcnn import FasterRCNN
 from MyDetector.engine import train_one_epoch, evaluate
 import datetime
 import os
+from MyDetector.Postprocess import postfilter
 
 def get_transform(train):
     transforms = []
@@ -46,6 +48,8 @@ class TorchVisionFasterRCNNDetector(object):
     def __init__(self, args):
         self.args = args
         use_cuda = True
+        self.threshold = args.threshold if args.threshold is not None else 0.1
+
         self.FULL_LABEL_CLASSES=args.FULL_LABEL_CLASSES
         
         num_classes = len(args.FULL_LABEL_CLASSES) #Unknown:0, Vehicles: 1, Pedestrians: 2, Cyclists: 3, Signs (removed)
@@ -69,8 +73,12 @@ class TorchVisionFasterRCNNDetector(object):
         pred_class = list(pred[0]['labels'].cpu().numpy()) #[i for i in list(pred[0]['labels'].cpu().numpy())] # Get the Prediction Score
         pred_boxes = [[(i[0], i[1]), (i[2], i[3])] for i in list(pred[0]['boxes'].detach().cpu().numpy())] # Bounding boxes
         pred_score = list(pred[0]['scores'].detach().cpu().numpy())
+
+        #Post filter based on threshold
+        pred_boxes, pred_class, pred_score = postfilter(pred_boxes, pred_class, pred_score, self.threshold)
         
         return pred_boxes, pred_class, pred_score
+
 
 #         bbox_xcycwh, cls_conf, cls_ids = [], [], []
 
