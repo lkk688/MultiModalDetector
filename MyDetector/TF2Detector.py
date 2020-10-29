@@ -85,52 +85,28 @@ class MyTF2Detector(object):
         
         #predlist=[scores.index(x) for x in scores if x > self.threshold] # Get list of index with score greater than threshold.
         pred_score=[x for x in scores if x > self.threshold] # Get list of index with score greater than threshold.
-        pred_t = np.where(scores==pred_score[-1])#get the last index
-        #print(pred_t)
-        pred_t=pred_t[0][0] #fetch value from tuple of array
-        #print(pred_t)
-        print("Box len:", len(boxes))
-        pred_boxes = boxes[:pred_t+1]
-        print("pred_score len:", len(pred_score))
-        #print("pred_boxes len:", len(pred_boxes))
-        pred_class = classes[:pred_t+1]
-        pred_class = [i-1 for i in list(pred_class)] # index starts with 1, 0 is the background in the tensorflow
-        #print(pred_class)
+        #print(pred_score)
+        if len(pred_score)<1:
+            print("Empty")
+            pred_boxes=[]
+            pred_class=[]
+            pred_score=[]
+        else:
+            pred_t = np.where(scores==pred_score[-1])#get the last index
+            #print(pred_t)
+            pred_t=pred_t[0][0] #fetch value from tuple of array
+            #print(pred_t)
+            print("Box len:", len(boxes))
+            pred_boxes = boxes[:pred_t+1]
+            print("pred_score len:", len(pred_score))
+            #print("pred_boxes len:", len(pred_boxes))
+            pred_class = classes[:pred_t+1]
+            pred_class = [i-1 for i in list(pred_class)] # index starts with 1, 0 is the background in the tensorflow
+            #print(pred_class)
             
-        #[ (xmin, ymin), (xmax, ymax)]
-        pred_boxes = [[(i[1]*im_width, i[0]*im_height), (i[3]*im_width, i[2]*im_height)] for i in list(pred_boxes)] # Bounding boxes
+            #[ (xmin, ymin), (xmax, ymax)]
+            pred_boxes = [[(i[1]*im_width, i[0]*im_height), (i[3]*im_width, i[2]*im_height)] for i in list(pred_boxes)] # Bounding boxes
         
-        return pred_boxes, pred_class, scores
-        #return outputs
-        #print(outputs)
-        
-        #if (self.args.showfig):
-#         plt.figure(figsize=(20,30))
-#         v = Visualizer(im[:, :, ::-1],
-#                        metadata=uavval_metadata, 
-#                        scale=0.8,  )
-#         v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-#         #cv2_imshow(v.get_image()[:, :, ::-1])
-#         plt.imshow(v.get_image()[:, :, ::-1])
-#         plt.show()
-            
-#             predictions = outputs["instances"].to("cpu")
-#             boxes = predictions.pred_boxes if predictions.has("pred_boxes") else None
-#             newboxes=_convert_boxes(boxes)
-            #bbox_xcycwh=BoxMode.convert(newboxes, BoxMode.XYXY_ABS, BoxMode.XYWH_ABS)  #BoxMode.convert(x, BoxMode.XYXY_ABS, BoxMode.XYWH_ABS)
+        return pred_boxes, pred_class, pred_score
 
-
-#         bbox_xcycwh, cls_conf, cls_ids = [], [], []
-
-#         #box format is XYXY_ABS
-#         for (box, _class, score) in zip(boxes, classes, scores):
-#             #if _class == 0: # the orignal code only track people?
-#             x0, y0, x1, y1 = box
-#             bbox_xcycwh.append([(x1 + x0) / 2, (y1 + y0) / 2, (x1 - x0), (y1 - y0)]) # convert to x-center, y-center, width, height
-#             cls_conf.append(score)
-#             cls_ids.append(_class)
-
-#         return np.array(bbox_xcycwh, dtype=np.float64), np.array(cls_conf), np.array(cls_ids)
-
-#     def detectwithvisualization(self, im)
-#         pred_boxes, classes, scores=self.detect(im)
+#def postprocess()
