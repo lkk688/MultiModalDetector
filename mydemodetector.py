@@ -18,12 +18,20 @@ class detectorargs:
 if __name__ == "__main__":
     mydetector = TF2Detector.MyTF2Detector(detectorargs)
 
+<<<<<<< HEAD
     #imgpath=os.path.join('./testdata', "traffic1.jpg")
     imgpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/validation_0000', "11901761444769610243_556_000_576_000_1515475579357063_FRONT.jpg")
+=======
+    imgpath=os.path.join('./testdata', "traffic1.jpg")
+>>>>>>> 089d3bb2a735f42ba1a0876bd34e6fae4b5b5604
     print(imgpath)
     bbox_xyxy, pred_labels, cls_conf=detectimage.detectoneimage_novis(imgpath, mydetector)
     print(pred_labels)
 
     outputvideopath='videoresult.mp4'
+<<<<<<< HEAD
     folderpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/', 'validation_0000')
     detectimage.detectimagefolder_tovideo(folderpath, mydetector, outputvideopath)
+=======
+    detectimage.detectimagefolder_tovideo(imgpath, mydetector, outputvideopath)
+>>>>>>> 089d3bb2a735f42ba1a0876bd34e6fae4b5b5604
