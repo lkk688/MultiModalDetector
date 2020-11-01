@@ -12,7 +12,8 @@ import os
 import numpy as np
 #%matplotlib inline
 #from matplotlib import pyplot as plt
-from MyDetector.Postprocess import postfilter
+#from MyDetector.Postprocess import postfilter
+from MyDetector import Postprocess
 
 class MyDetectron2Detector(object):
     #args.showfig
@@ -90,9 +91,12 @@ class MyDetectron2Detector(object):
         #pred_score = list(pred[0]['scores'].detach().cpu().numpy())
         
         #Post filter based on threshold
-        pred_boxes, pred_class, pred_score = postfilter(pred_boxes, pred_class, pred_score, self.threshold)
-       
+        #pred_boxes, pred_class, pred_score = postfilter(pred_boxes, pred_class, pred_score, self.threshold)
+        pred_boxes, pred_class, pred_score = Postprocess.postfilter_thresholdandsize(pred_boxes, pred_class, pred_score, self.threshold, minsize=1)
+        
         return pred_boxes, pred_class, pred_score
+        #return np.array(pred_boxes), np.array(pred_class), np.array(pred_score)
+
 
 #         bbox_xcycwh, cls_conf, cls_ids = [], [], []
 

@@ -1,7 +1,7 @@
 import numpy as np
 
 def postfilter(boxes, classes, scores, threshold):
-    pred_score=[x for x in scores if x > threshold] # Get list of index with score greater than threshold.
+    pred_score=[x for x in scores if x > threshold] # Get list of score with score greater than threshold.
     #print(pred_score)
     if len(pred_score)<1:
         print("Empty")
@@ -18,4 +18,18 @@ def postfilter(boxes, classes, scores, threshold):
         print("pred_score len:", len(pred_score))
         #print("pred_boxes len:", len(pred_boxes))
         pred_class = classes[:pred_t+1]
+    return pred_boxes, pred_class, pred_score
+
+def postfilter_thresholdandsize(boxes, classes, scores, threshold, minsize):
+    num=len(scores)
+    pred_boxes=[]
+    pred_class=[]
+    pred_score=[]
+    for i in range(num):
+        boxsizex=boxes[i][1][0]-boxes[i][0][0]
+        boxsizey=boxes[i][1][1]-boxes[i][0][1]
+        if scores[i]>threshold and boxsizex>minsize and boxsizey>minsize:
+            pred_boxes.append(boxes[i])
+            pred_class.append(classes[i])
+            pred_score.append(scores[i])
     return pred_boxes, pred_class, pred_score

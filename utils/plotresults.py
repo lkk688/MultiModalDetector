@@ -59,6 +59,50 @@ def draw_boxes(image, pred_bbox, pred_ids, pred_score, INSTANCE_CATEGORY_NAMES):
             cv2.putText(image,label,(x1,y1+t_size[1]+4), cv2.FONT_HERSHEY_PLAIN, labelscale, [255,255,255], 2)
     return image
 
+def draw_boxes(img, bbox, identities=None, offset=(0,0)):
+    for i,box in enumerate(bbox):
+        x1,y1,x2,y2 = [int(i) for i in box]
+        x1 += offset[0]
+        x2 += offset[0]
+        y1 += offset[1]
+        y2 += offset[1]
+        # box text and bar
+        id = int(identities[i]) if identities is not None else 0    
+        color = compute_color_for_labels(id)
+        label = '{}{:d}'.format("", id)
+        t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 2 , 2)[0]
+        cv2.rectangle(img,(x1, y1),(x2,y2),color,3)
+        cv2.rectangle(img,(x1, y1),(x1+t_size[0]+3,y1+t_size[1]+4), color,-1)
+        cv2.putText(img,label,(x1,y1+t_size[1]+4), cv2.FONT_HERSHEY_PLAIN, 2, [255,255,255], 2)
+    return img
+
+def draw_trackingboxes(image, pred_bbox, identities=None):
+    boxnum=len(pred_bbox)
+    #print(boxnum)
+    if boxnum<1:
+        print("No object detected")
+        return image
+    else:
+        for i in range(boxnum):#patch in pred_bbox:
+            patch=pred_bbox[i] # [ xmin, ymin, xmax, ymax]
+            #patch[0] (xmin, ymin)
+            #patch[1] (xmax, ymax)
+            x1=int(patch[0])
+            y1=int(patch[1])
+            x2=int(patch[2])
+            y2=int(patch[3]) #cv2.rectangle need int input not float
+            id = int(identities[i]) if identities is not None else 0    
+            colorlabel = compute_color_for_labels(id)
+
+            #colorlabel=compute_color_for_labels(pred_ids[i]) #RGB value 0-255
+            label="T:"+str(id)
+            labelscale=1
+            t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, labelscale , 2)[0] #font scale: 1, font_thickness: 1
+            cv2.rectangle(image, (x1, y1), (x2,y2), colorlabel, 2)
+            cv2.rectangle(image, (x1, y1), (x1+t_size[0]+3, y1+t_size[1]+4), colorlabel, -1) #-1 is fill the rectangle
+            cv2.putText(image,label,(x1,y1+t_size[1]+4), cv2.FONT_HERSHEY_PLAIN, labelscale, [255,255,255], 2)
+    return image
+
 def show_image_bbxyxy(image, pred_bbox, pred_ids, title, INSTANCE_CATEGORY_NAMES, savefigname=None):
     """Show a camera image and the given camera labels."""
         

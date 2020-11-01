@@ -50,7 +50,8 @@ def testTorchVisionDetector(detectorargs):
 
 def testDetectron2Detector(detectorargs):
     mydetector = Detectron2Detector.MyDetectron2Detector(detectorargs)
-    imgpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/validation_0000', "11901761444769610243_556_000_576_000_1515475579357063_FRONT.jpg")
+    #imgpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/validation_0000', "11901761444769610243_556_000_576_000_1515475579357063_FRONT.jpg")
+    imgpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/validation_0000', "10247954040621004675_2180_000_2200_000_1553810174060909_FRONT.jpg")
     print(imgpath)
     bbox_xyxy, pred_labels, cls_conf=detectimage.detectoneimage_novis(imgpath, mydetector)
     print(pred_labels)
@@ -77,10 +78,10 @@ def testTF2Detector(detectorargs):
 
 if __name__ == "__main__":
     #Test TF2
-    testTF2Detector(TF2detectorargs)
+    #testTF2Detector(TF2detectorargs)
 
     #Test Detectron2
-    #testDetectron2Detector(Detectron2detectorargs)
+    testDetectron2Detector(Detectron2detectorargs)
 
     #Test TorchVision
     #testTorchVisionDetector(TorchVisiondetectorargs)
