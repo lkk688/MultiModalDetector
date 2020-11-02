@@ -10,6 +10,8 @@ from MyDetector import TorchVisionDetector
 from utils import detectandtrack, detectimage
 
 from MyTracker.deep_sort import DeepSort
+from MyTracker.deep_sort import MyDeepSort
+from utils import extractWaymoTFrecordimages
 
 class Detectron2detectorargs:
     modelname = 'faster_rcnn_X_101_32x8d_FPN_3x'
@@ -37,11 +39,20 @@ def testDetectron2Detector(detectorargs):
     detectimage.detectimagefolder_tovideo(folderpath, mydetector, outputvideopath)
 
 if __name__ == "__main__":
+
+    #Extract the waymo tf record file to image folder
+    PATH='/mnt/DATA5T/WaymoDataset'
+    folderslist = validation_folders = ["Validation0000"]
+    out_dir='/mnt/DATA5T/WaymoDataset/Extracted'
+    step=1
+    extractWaymoTFrecordimages.extractWaymoTFrecordimages(PATH, folderslist, out_dir, step)
+
     deepsort_checkpoint='/home/kaikai/Documents/MyDetector/ModelOutput/deepsortcheckpoint/ckpt.t7'
-    deepsort = DeepSort(deepsort_checkpoint, use_cuda=True)
+    mydeepsort = MyDeepSort(deepsort_checkpoint, use_cuda=True)
 
     mydetector = Detectron2Detector.MyDetectron2Detector(Detectron2detectorargs)
 
     outputvideopath='detectron2trackvideoresult.mp4'
-    folderpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/', 'validation_0000')
-    detectandtrack.trackimagefolder_tovideo(folderpath, mydetector, deepsort, outputvideopath)
+    #folderpath=os.path.join('/mnt/DATA5T/WaymoDataset/WaymoCOCO/Validation/', 'validation_0000')
+    folderpath=os.path.join('/mnt/DATA5T/WaymoDataset/Extracted', 'Validation0000')
+    detectandtrack.trackimagefolder_tovideo(folderpath, mydetector, mydeepsort, outputvideopath)

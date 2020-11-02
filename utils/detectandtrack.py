@@ -37,7 +37,7 @@ def trackimagefolder_tovideo(imgpath, mydetector, mytracker, outputvideopath):
         #_, im = self.vdo.retrieve()
         ori_im = cv2.imread(filepath)
         print(ori_im.shape)
-        im = cv2.cvtColor(ori_im, cv2.COLOR_BGR2RGB)
+        im = cv2.cvtColor(ori_im, cv2.COLOR_BGR2RGB)#opencv always read image in BGR format, convert to RGB format
         #Perform detection
         bbox_xyxy, cls_ids, cls_conf = mydetector.detect(im)
         end = time.time()
@@ -47,13 +47,21 @@ def trackimagefolder_tovideo(imgpath, mydetector, mytracker, outputvideopath):
         bbox_xcycwh=bboxtool._xyxy_to_xcycwh(bbox_xyxy)
         
         if bbox_xcycwh is not None and len(bbox_xcycwh)>0:
-            deepoutputs = mytracker.update(bbox_xcycwh, cls_conf, im)
+            #select classes
+            mask = cls_ids <= 2
+            cls_ids = cls_ids[mask]
+            bbox_xcycwh = bbox_xcycwh[mask]
+            #bbox_xcycwh[:, 3:] *= 1.2
+            cls_conf = cls_conf[mask]
+
+            deepoutputs = mytracker.update(bbox_xcycwh, cls_conf, cls_ids, im)
             # draw boxes for visualization
             if len(deepoutputs) > 0:
                 bbox_tlwh = [] #same to xywh
                 bbox_xyxy = deepoutputs[:, :4]
-                identities = deepoutputs[:, -1]
-                ori_im = plotresults.draw_trackingboxes(im, bbox_xyxy, identities)
+                identities = deepoutputs[:, -2]
+                track_class = deepoutputs[:, -1]
+                im = plotresults.draw_trackingboxes(im, bbox_xyxy, identities, track_class, mydetector.FULL_LABEL_CLASSES)
                 #ori_im = draw_boxes(ori_im, bbox_xyxy, identities)
 
                 for bb_xyxy in bbox_xyxy:
@@ -64,7 +72,7 @@ def trackimagefolder_tovideo(imgpath, mydetector, mytracker, outputvideopath):
 
 
         #img_box = plotresults.draw_boxes(im, bbox_xyxy, cls_ids, cls_conf, mydetector.FULL_LABEL_CLASSES)
-        videooutput.write(ori_im)
+        videooutput.write(im)
         #plotresults.show_imagewithscore_bbxyxy(im, bbox_xyxy, cls_ids, cls_conf, imgpath, mydetector.FULL_LABEL_CLASSES, outputvideopath+imageid+''.jpg')
     
     videooutput.release()
