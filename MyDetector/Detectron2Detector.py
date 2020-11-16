@@ -42,13 +42,16 @@ class MyDetectron2Detector(object):
         self.cfg.DATALOADER.NUM_WORKERS = 1 #2
         #cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")  # Let training initialize from model zoo
         self.cfg.MODEL.WEIGHTS = os.path.join(self.args.modelbasefolder, self.args.modelfilename) #model_0159999.pth
+        if os.path.isfile(self.cfg.MODEL.WEIGHTS) == False:
+            self.cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/"+self.args.modelname+".yaml")  # Let training initialize from model zoo
+        else:
+            self.cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512#128   # faster, and good enough for this toy dataset (default: 512)
+            self.cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.FULL_LABEL_CLASSES)  # Kitti has 9 classes (including donot care)
         #self.cfg.MODEL.WEIGHTS = os.path.join('/home/010796032/PytorchWork/output_uav', "model_0119999.pth") #model_0159999.pth
         #cfg.MODEL.WEIGHTS = os.path.join('/home/010796032/PytorchWork', "fasterrcnn_x101_fpn_model_final_68b088.pkl")#using the local downloaded model
         self.cfg.SOLVER.IMS_PER_BATCH = 2
         self.cfg.SOLVER.BASE_LR = 0.00025  # pick a good LRgkyjmh,
         self.cfg.SOLVER.MAX_ITER = 100000    # you may need to train longer for a practical dataset
-        self.cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 512#128   # faster, and good enough for this toy dataset (default: 512)
-        self.cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(self.FULL_LABEL_CLASSES)  # Kitti has 9 classes (including donot care)
 
         self.cfg.TEST.DETECTIONS_PER_IMAGE = 500
         

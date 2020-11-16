@@ -1,6 +1,9 @@
 *.mp4
 *.avi
 *.jpg
-*.pdf
+*.pt
+*.pth
+*.ckpt
+__pycache__
 .ipynb_checkpoints/
 .vscode/
