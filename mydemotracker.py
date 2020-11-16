@@ -72,17 +72,30 @@ def videotrackingdemo():
     videopath=os.path.join('/mnt/DATA5T/NVIDIAAICitydataset/Track1/train/S01/c004/', 'vdo.avi')#rlc2-151808-152038
     detectandtrack.trackvideo_tovideo(videopath, mydetector, mydeepsort, outputvideopath)
 
+def MOTtrackingdemo():
+    deepsort_checkpoint='/home/kaikai/Documents/MyDetector/ModelOutput/deepsortcheckpoint/ckpt.t7'
+    mydeepsort = MyDeepSort(deepsort_checkpoint, use_cuda=True)
+
+    mydetector = Detectron2Detector.MyDetectron2Detector(Detectron2detectorargs)
+
+    outputvideopath='../results/mot17videoresult.mp4'
+    data_root='/mnt/DATA5T/MOT/MOT17/train'
+    seq='MOT17-04-SDP'
+    folderpath=os.path.join(data_root, seq , 'img1')
+    detectandtrack.trackimagefolder_tovideo(folderpath, mydetector, mydeepsort, outputvideopath)
+
 def motevaluation():
     data_root='/mnt/DATA5T/MOT/MOT17/train'
     result_path='/mnt/DATA5T/MOT/results'
-    seqs=('MOT17-02-SDP','MOT17-04-SDP', 'MOT17-05-SDP',)
+    #seqs=('MOT17-02-SDP','MOT17-04-SDP', 'MOT17-05-SDP',)
+    seqs=('MOT17-04-SDP',)
     #seq='MOT17-02-SDP'
     data_type = 'mot'
     accs = []
     for seq in seqs:
         evaluator = MoTEvaluator(data_root, seq, data_type)
-        result_filename=os.path.join(result_path, '{}.txt'.format(seq))
-        #result_filename=os.path.join(result_root, '{}.txt'.format(seq))
+        #result_filename=os.path.join(result_path, '{}.txt'.format(seq))
+        result_filename=os.path.join('./', '{}.txt'.format('mot17results'))
         accs.append(evaluator.eval_file(result_filename))
         #evaluator.eval_file(result_filename)
 
@@ -96,11 +109,12 @@ def motevaluation():
         namemap=mm.io.motchallenge_metric_names
     )
     print(strsummary)
-    MoTEvaluator.save_summary(summary, os.path.join('../results', 'summary_{}.xlsx'.format('mot')))
+    MoTEvaluator.save_summary(summary, os.path.join('../results', 'mymot17summary_{}.xlsx'.format('mot')))
 
 if __name__ == "__main__":
     #waymotrackingdemo()
-    videotrackingdemo()
-    #motevaluation()
+    #MOTtrackingdemo()
+    #videotrackingdemo()
+    motevaluation()
 
     

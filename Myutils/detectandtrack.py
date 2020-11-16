@@ -25,7 +25,7 @@ def trackimagefolder_tovideo(imgpath, mydetector, mytracker, outputvideopath):
     fourcc = cv2.VideoWriter_fourcc('M','P','4','V')
     #fourcc = cv2.VideoWriter_fourcc(*'XVID')
  #cv2.VideoWriter_fourcc(*'MJPG')#cv2.VideoWriter_fourcc('M','P','4','V')  #cv2.VideoWriter_fourcc(*'MJPG')
-    videooutput = cv2.VideoWriter(outputvideopath, fourcc, 1, (im_width, im_height)) #20
+    videooutput = cv2.VideoWriter(outputvideopath, fourcc, 5, (im_width, im_height)) #20
         
     for imgidx in range(imglen): #imglen  while self.vdo.grab():
         filepath=imagepath[imgidx]
@@ -45,18 +45,23 @@ def trackimagefolder_tovideo(imgpath, mydetector, mytracker, outputvideopath):
         end = time.time()
         print("Detection time: {:.03f}s, fps: {:.03f}, detection numbers: {}".format(end - start, 1 / (end - start), len(bbox_xyxy)))
 
+        trackstart = time.time()
         #convert bbox_xyxy (tuple, [(189.2432, 646.61523), (298.20505, 718.8962)]) to bbox_xcycwh (numpy.ndarray, [243.5, 682.0, 109, 72]) 
         bbox_xcycwh=bboxtool._xyxy_to_xcycwh(bbox_xyxy)
         
         if bbox_xcycwh is not None and len(bbox_xcycwh)>0:
             #select classes
-            mask = cls_ids <= 2
+            mask = cls_ids <= 6
             cls_ids = cls_ids[mask]
             bbox_xcycwh = bbox_xcycwh[mask]
             #bbox_xcycwh[:, 3:] *= 1.2
             cls_conf = cls_conf[mask]
 
             deepoutputs = mytracker.update(bbox_xcycwh, cls_conf, cls_ids, im)
+
+            trackend = time.time()
+            print("Tracking time: {:.03f}s, fps: {:.03f}, track numbers: {}".format(trackend - trackstart, 1 / (trackend - trackstart), len(deepoutputs)))
+           
             # draw boxes for visualization
             if len(deepoutputs) > 0:
                 bbox_tlwh = [] #same to xywh
@@ -72,12 +77,13 @@ def trackimagefolder_tovideo(imgpath, mydetector, mytracker, outputvideopath):
 
                 results.append((imgidx, bbox_tlwh, identities))
 
-
+        print("time: {}s, fps: {}".format(end - start, 1/(end-start)))
         #img_box = plotresults.draw_boxes(im, bbox_xyxy, cls_ids, cls_conf, mydetector.FULL_LABEL_CLASSES)
         videooutput.write(im)
         #plotresults.show_imagewithscore_bbxyxy(im, bbox_xyxy, cls_ids, cls_conf, imgpath, mydetector.FULL_LABEL_CLASSES, outputvideopath+imageid+''.jpg')
     
     videooutput.release()
+    exportresults.write_results('mot17results.txt', results, 'mot')
     print("Finished all detections")
 
 def trackvideo_tovideo(video_path, mydetector, mytracker, outputvideopath):
