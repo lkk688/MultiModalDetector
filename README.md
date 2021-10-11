@@ -4,7 +4,7 @@ This project creates a multimodal object detector via multiple state-of-the-art 
 # Trainer
 
 ## Object Detection training and evaluation based on Tensorflow2 Object Detection
-* Tensorflow2-objectdetection-xxx.ipynb is the Google Colab sample code to perform object detection and training based on Tensorflow2 object detection (latest version) and utilize the converted Waymo TFRecord file in Google Cloud storage.
+* Tensorflow2-objectdetection-xxx.ipynb is the sample code to perform object detection and training based on Tensorflow2 object detection (colab version: [colabversion](https://colab.research.google.com/drive/17ri16QfSCR1ia0O0ZKi4tSwTdMyWEI3-?usp=sharing)) and utilize the converted Waymo TFRecord file in Google Cloud storage.
 
 ## Object Detection training and evaluation based on Pytorch Torchvision (FasterRCNN)
 * The sample code to play with Torchvision in Colab: [colab link](https://colab.research.google.com/drive/1DKZUL5ylKjiKtfOCGpirjRA3j8rIOs9M?usp=sharing) (you need to use SJSU google account to view)
